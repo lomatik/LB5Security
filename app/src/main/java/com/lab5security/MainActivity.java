@@ -11,7 +11,11 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -33,6 +37,13 @@ public class MainActivity extends AppCompatActivity {
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         Button button = findViewById(R.id.button1);
+        Button button_encrypt = findViewById(R.id.button2);
+        Button button_decrypt = findViewById(R.id.button3);
+
+        EditText text_to_crypt = findViewById(R.id.editTextTextPersonName);
+
+        TextView decrypted_text = findViewById(R.id.textView);
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
