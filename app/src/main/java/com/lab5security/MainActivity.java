@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -30,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
 
     static final int GALLERY_REQUEST = 1;
 
+    Uri path_to_image;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +55,32 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(photoPickerIntent, GALLERY_REQUEST);
             }
         });
+
+        button_encrypt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String text_forencrypt = text_to_crypt.getText().toString();
+                File image = new File(getPath(path_to_image));
+                try {
+                    Imageencrypt(text_forencrypt,image,1488);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        button_decrypt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                File image = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/1.jpg");
+                try {
+                    String decrypt_text = Imagedecrypt(image,1488);
+                    decrypted_text.setText(decrypt_text);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     @Override
@@ -64,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
         switch(requestCode) {
             case GALLERY_REQUEST:
                 if(resultCode == RESULT_OK){
+                    path_to_image = imageReturnedIntent.getData();
                     Uri selectedImage = imageReturnedIntent.getData();
                     try {
                         bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
@@ -239,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void Imagedecrypt(File filename,int key)throws java.io.IOException {
+    public String Imagedecrypt(File filename,int key)throws java.io.IOException {
         FileInputStream ins=new FileInputStream(filename);
         byte b[]=new byte[2];
         BigInteger bb1;
@@ -294,5 +324,17 @@ public class MainActivity extends AppCompatActivity {
         }
         String message=new String(me);
         ins.close();
+        return message;
+    }
+
+    public String getPath(Uri uri) {
+        String[] projection = { MediaStore.Images.Media.DATA };
+        Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
+        if (cursor == null) return null;
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        String s=cursor.getString(column_index);
+        cursor.close();
+        return s;
     }
 }
